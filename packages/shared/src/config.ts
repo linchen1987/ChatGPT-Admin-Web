@@ -134,6 +134,7 @@ export const ConfigSchema = z
         .url()
         .default('postgres://postgres:postgres@localhost:5432/postgres'),
     }),
+    https_proxy: z.string(),
   })
   .merge(CompatibilityConfigSchema)
   .merge(ThirdPartyServiceConfigSchema);

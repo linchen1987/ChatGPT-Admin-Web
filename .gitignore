@@ -9,6 +9,7 @@ apps/server/.env
 # IDE
 .vscode/
 .idea/
+/.local
 
 **/.next/
 **/.vscode/

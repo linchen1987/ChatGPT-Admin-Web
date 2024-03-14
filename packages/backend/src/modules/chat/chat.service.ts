@@ -7,6 +7,7 @@ import {
   ChatCompletionChunk,
 } from 'openai/src/resources/chat/completions';
 import { Observable } from 'rxjs';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 import { Inject, Injectable } from '@nestjs/common';
 import { type ChatMessage, ChatMessageRole } from '@prisma/client';
@@ -21,6 +22,7 @@ import { ErrorCodeEnum } from 'shared';
 export class ChatService {
   private openaiConfig;
   private openai: OpenAI;
+  private httpsProxy;
 
   constructor(
     @Inject('PrismaService')
@@ -28,6 +30,7 @@ export class ChatService {
     configService: ConfigService,
   ) {
     this.openaiConfig = configService.get('openai');
+    this.httpsProxy = configService.get('https_proxy') || '';
   }
 
   /* 获取指定用户最近时间内消息的总计，用于limit */
@@ -190,9 +193,11 @@ export class ChatService {
     histories?: OpenAI.Chat.CreateChatCompletionRequestMessage[];
     stream?: boolean;
   }) {
+    console.log(this.httpsProxy);
     const openai = new OpenAI({
       baseURL: this.openaiConfig.baseUrl,
       apiKey: this.openaiConfig.keys[0],
+      httpAgent: this.httpsProxy ? new HttpsProxyAgent(this.httpsProxy || '') : undefined,
     });
     return openai.chat.completions.create({
       model,
@@ -218,6 +223,7 @@ export class ChatService {
     const openai = new OpenAI({
       baseURL: this.openaiConfig.baseUrl,
       apiKey: this.openaiConfig.keys[0],
+      httpAgent: this.httpsProxy ? new HttpsProxyAgent(this.httpsProxy || '') : undefined,
     });
     return openai.chat.completions.create({
       model,
